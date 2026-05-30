@@ -1,18 +1,63 @@
 # vLLM-Operator
-Kubernetes Operator in Go for production vLLM deployment. Automates storage provisioning and model weight pre-downloading via ephemeral Jobs to eliminate HPA cold-start bottlenecks.
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Go Version](https://img.shields.io/badge/Go-v1.22%2B-00ADD8?logo=go)](https://golang.org/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.26%2B-326CE5?logo=kubernetes)](https://kubernetes.io/)
 
-# Quick Start
-## 1. Prerequisites
+`vllm-operator` is a Kubernetes operator designed to automate the lifecycle, storage provisioning, and deployment scaling of Large Language Models (LLMs) served via vLLM.
 
-- Kubernetes cluster (v1.26+) or a local Kind / Minikube setup.
-- Go v1.22+ installed (for local development).
-- kubectl configured to your cluster.
+---
 
-## 2. Define your Custom Resource (CR)
+## Motivation
 
-Create a file named mistral-7b.yaml to declare your high-performance serving infrastructure:
-```YAML
+Deploying large AI models (30GB+) on Kubernetes exposes several operational challenges that standard stateless application patterns (like simple Helm charts) fail to solve cleanly:
 
+1. **The InitContainer Anti-Pattern:** Downloading model weights from Hugging Face inside an initContainer means that whenever a Pod restarts or horizontal autoscaling (HPA) triggers, the new replica re-downloads the entire model. This leads to severe network saturation, Hugging Face API rate limits, and cold-start delays exceeding 20 minutes.
+2. **Readiness Probe Failure:** Slow storage allocation or network choking during model warmup frequently causes Kubernetes liveness and readiness probes to time out, killing the container before the model finishes loading into memory.
+
+### Solution
+This operator decouples the model orchestration into two distinct phases: a stateful **Warmup Phase** (handled via an ephemeral, one-time Kubernetes Job that pulls data into a dedicated PersistentVolumeClaim) and a stateless **Serving Phase** (vLLM pods mounting the pre-populated volume).
+
+---
+
+## Architecture
+
+The reconciliation loop orchestrates standard Kubernetes primitives sequentially:
+
+```text
+[ VLLMModel Custom Resource Applied ]
+                  │
+                  ▼
+   ┌─────────────────────────────┐
+   │ 1. Storage Provisioning     │ ──► Allocates a dedicated PVC using
+   │                             │     the requested StorageClass.
+   └─────────────────────────────┘
+                  │
+                  ▼
+   ┌─────────────────────────────┐
+   │ 2. Ephemeral Warmup Job     │ ──► Executes a one-time Kubernetes Job
+   │                             │     to parallel-download model weights.
+   └─────────────────────────────┘
+                  │
+                  ▼
+   ┌─────────────────────────────┐
+   │ 3. vLLM Deployment          │ ──► Mounts the pre-populated PVC into
+   │                             │     serving Pods for near-instant startup.
+   └─────────────────────────────┘
+```
+
+---
+
+## Quick Start
+
+### Prerequisites
+* Kubernetes cluster v1.26+ (or local dev setups like Kind / Minikube)
+* Go v1.22+
+* kubectl configured to your cluster context
+
+### 1. Manifest Definition
+Create a file named `mistral-7b.yaml`:
+
+```yaml
 apiVersion: infra.PhenixForge.io/v1alpha1
 kind: VLLMModel
 metadata:
@@ -21,73 +66,138 @@ spec:
   modelId: "mistralai/Mistral-7B-Instruct-v0.3"
   replicas: 2
   storageSize: "30Gi"
-  storageClass: "local-path" # Perfect for local testing on Kind
+  storageClass: "local-path" # Use standard cloud storage classes in cloud envs
+  resources:
+    limits:
+      nvidia.com/gpu: "1"
+      memory: "32Gi"
+      cpu: "4"
+    requests:
+      nvidia.com/gpu: "1"
+      memory: "16Gi"
+      cpu: "2"
+  env:
+    - name: VLLM_MAX_MODEL_LEN
+      value: "4096"
+    - name: VLLM_TENSOR_PARALLEL_SIZE
+      value: "1"
 ```
 
-## 3. Deploy the Operator
+### 2. Deploy and Run the Operator
 
-### Clone the repository
-```shell
-git clone [https://github.com/PhenixForge/vllm-operator.git](https://github.com/PhenixForge/vllm-operator.git)
+```bash
+# Clone the repository
+git clone https://github.com/PhenixForge/vllm-operator.git
 cd vllm-operator
 
-# Install the Custom Resource Definitions (CRDs) onto the cluster
+# Install the CRDs onto the cluster
 make install
 
-# Run the controller locally against your cluster context
+# Run the controller locally against your active cluster context
 make run
 ```
 
-In another terminal, apply your model manifest:
-
-```shell
+In a separate terminal, apply the resource:
+```bash
 kubectl apply -f mistral-7b.yaml
 ```
 
-### 4. Verify that it works
-Check the Pods and PVCs:
-```shell
-kubectl get pods -l app=vllm-model
-kubectl get pvc -l app=vllm-model
+### 3. Track Status and Primitives
+
+Monitor the lifecycle phase transitions directly on the Custom Resource:
+```bash
+kubectl get vllmmodel mistral-7b-prod -o yaml
 ```
 
-## 4. Monitor the Lifecycle Status
+The resource transitions through the following statuses: `Provisioning` ➔ `Downloading` ➔ `Ready`.
 
-`kubectl get vllmmodel mistral-7b-prod -o yaml`
+To verify the underlying resources generated by the operator:
+```bash
+$ kubectl get pvc,jobs,deployments -l app.kubernetes.io/managed-by=vllm-operator
 
-The custom status field will transition naturally through the infrastructure phases: 
+NAME                                    STATUS      VOLUME
+persistentvolumeclaim/mistral-7b-pvc    Bound    pvc-1234-abcd
 
-Provisioning ──► Downloading ──► Ready.
+NAME                                    COMPLETIONS   DURATION   AGE
+job.batch/mistral-7b-warmup-job          1/1           3m12s     4m
 
-# Project Directory Structure
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/vllm-server-dist         2/2        2            2       45s
+```
 
-This project follows the modern standard layout generated by Kubebuilder:
-```Plaintext
+---
+
+## Directory Layout
+
+This repository complies with the standard Kubebuilder project structure:
+
+```text
 vllm-operator/
 ├── api/v1alpha1/
-│   └── vllmmodel_types.go     # Go structs defining the Spec and Status schema
+│   └── vllmmodel_types.go     # Custom Resource Definition Go schema (Spec/Status)
 ├── internal/controller/
-│   └── vllmmodel_controller.go # Core Reconciliation logic (PVC -> Job -> Deployment)
+│   └── vllmmodel_controller.go # Core reconciliation logic
 ├── config/
-│   ├── crd/                    # Auto-generated Kustomize YAML manifests for the CRD
-│   └── rbac/                   # Fine-grained RBAC roles required by the controller
-└── Makefile                    # Development automation tool (manifests, install, run)
+│   ├── crd/                    # Auto-generated Kustomize manifests for CRDs
+│   └── rbac/                   # RBAC cluster roles required by the controller
+└── Makefile                    # Automation targets for building, testing, and running
 ```
 
-# Development & Tooling
+---
 
-The operator utilizes standard Kubebuilder macros to auto-generate RBAC configurations and manifests. Every time you update the Go API specifications, remember to run:
-shell
+## Monitoring & Operational Notes
 
-The operator utilizes standard Kubebuilder macros to auto-generate RBAC configurations and manifests. Every time you update the Go API specifications, remember to run:
+* **Metrics Export:** The operator configures serving pods to expose native vLLM Prometheus metrics on port `8000/metrics`, covering KV cache utilization, request concurrency, and TTFT (Time To First Token).
+* **Probes:** Pod readiness and liveness bindings track the internal vLLM health state, ensuring traffic routing only occurs once the model is fully resident in GPU memory.
 
-```shell
-# Regenerate deepcopy and manifests
+### Metrics
+The operator exposes the following **Prometheus metrics** on port `8000/metrics`:
+   Metric | Description | Type |
+ |--------|-------------|------|
+ | `vllm_model_ttft_seconds` | Time To First Token (per request) | Histogram |
+ | `vllm_model_throughput_tokens_per_second` | Token generation rate | Gauge |
+ | `vllm_model_kv_cache_utilization` | KV cache memory usage (%) | Gauge |
+ | `vllm_model_gpu_memory_used_bytes` | GPU memory consumed | Gauge |
+ | `vllm_model_request_concurrency` | Active requests | Gauge |
+
+**Example Prometheus query** to alert on high TTFT:
+```promql
+histogram_quantile(0.95, sum(rate(vllm_model_ttft_seconds_bucket[5m])) by (le))
+
+---
+
+## Roadmap
+
+- [ ] Private registry support (Hugging Face / CivitAI authentication via Kubernetes Secrets)
+- [ ] Native Horizontal Pod Autoscaler (HPA) targets mapping to vLLM concurrency metrics
+- [ ] Multi-GPU Tensor Parallelism configuration schema
+
+---
+
+## Development & Testing
+
+Run the test suite locally against the Kubebuilder envtest control plane:
+
+```bash
+# Regenerate deepcopy code and CRD manifests
 make manifests
 
-# Run unit/integration tests
+# Execute unit and integration tests
 make test
 ```
-# License
 
-Distributed under the Apache License 2.0. See LICENSE for more information.
+Expected output:
+```text
+go test ./... -coverprofile cover.out
+?       github.com/PhenixForge/vllm-operator/api/v1alpha1     [no test files]
+ok      github.com/PhenixForge/vllm-operator/internal/controller  5.432s  coverage: 82.4% of statements
+```
+
+---
+
+## License
+
+Distributed under the Apache License 2.0. See `LICENSE` for more information.
+
+# Contacts
+[Julien P.](https://www.linkedin.com/in/julien-p-68834731/?locale=fr)
