@@ -46,7 +46,7 @@ kubectl apply -f mistral-7b.yaml
 
 ### 4. Verify that it works
 Check the Pods and PVCs:
-```bash
+```shell
 kubectl get pods -l app=vllm-model
 kubectl get pvc -l app=vllm-model
 ```
@@ -77,11 +77,11 @@ vllm-operator/
 # Development & Tooling
 
 The operator utilizes standard Kubebuilder macros to auto-generate RBAC configurations and manifests. Every time you update the Go API specifications, remember to run:
-Bash
+shell
 
 The operator utilizes standard Kubebuilder macros to auto-generate RBAC configurations and manifests. Every time you update the Go API specifications, remember to run:
 
-```bash
+```shell
 # Regenerate deepcopy and manifests
 make manifests
 
