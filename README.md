@@ -163,7 +163,7 @@ The operator exposes the following **Prometheus metrics** on port `8000/metrics`
 **Example Prometheus query** to alert on high TTFT:
 ```promql
 histogram_quantile(0.95, sum(rate(vllm_model_ttft_seconds_bucket[5m])) by (le))
-
+```
 ---
 
 ## Roadmap
