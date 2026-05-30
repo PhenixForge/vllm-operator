@@ -1,7 +1,4 @@
-# vllm-operator
-Kubernetes Operator in Go for production vLLM deployment. Automates storage provisioning and model weight pre-downloading via ephemeral Jobs to eliminate HPA cold-start bottlenecks.
-
-# vllm-operator
+# vLLM-Operator
 Kubernetes Operator in Go for production vLLM deployment. Automates storage provisioning and model weight pre-downloading via ephemeral Jobs to eliminate HPA cold-start bottlenecks.
 
 Quick Start
@@ -32,14 +29,15 @@ spec:
 Bash
 
 # Clone the repository
+```shell
 git clone [https://github.com/jpetron/vllm-operator.git](https://github.com/jpetron/vllm-operator.git)
-cd vllm-operator
+cd vllm-operator```
 
 # Install the Custom Resource Definitions (CRDs) onto the cluster
-make install
+`make install`
 
 # Run the controller locally against your cluster context
-make run
+`make run`
 
 In another terminal, apply your model manifest:
 Bash
