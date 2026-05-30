@@ -35,12 +35,11 @@ cd vllm-operator
 make install
 
 # Run the controller locally against your cluster context
-make run```
+make run
+```
 
 In another terminal, apply your model manifest:
-`
-kubectl apply -f mistral-7b.yaml
-`
+`kubectl apply -f mistral-7b.yaml`
 
 # 4. Monitor the Lifecycle Status
 
