@@ -78,7 +78,7 @@ make manifests
 
 # Run unit/integration tests
 make test
-
+```
 # License
 
 Distributed under the Apache License 2.0. See LICENSE for more information.
