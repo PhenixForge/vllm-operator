@@ -28,19 +28,22 @@ The reconciliation loop orchestrates standard Kubernetes primitives sequentially
                   │
                   ▼
    ┌─────────────────────────────┐
-   │ 1. Storage Provisioning     │ ──► Allocates a dedicated PVC using
+   │                             │
+   │   1. Storage Provisioning   │ ──► Allocates a dedicated PVC using
    │                             │     the requested StorageClass.
    └─────────────────────────────┘
                   │
                   ▼
    ┌─────────────────────────────┐
-   │ 2. Ephemeral Warmup Job     │ ──► Executes a one-time Kubernetes Job
+   │                             │
+   │  2. Ephemeral Warmup Job    │ ──► Executes a one-time Kubernetes Job
    │                             │     to parallel-download model weights.
    └─────────────────────────────┘
                   │
                   ▼
    ┌─────────────────────────────┐
-   │ 3. vLLM Deployment          │ ──► Mounts the pre-populated PVC into
+   │                             │ 
+   │    3. vLLM Deployment       │ ──► Mounts the pre-populated PVC into
    │                             │     serving Pods for near-instant startup.
    └─────────────────────────────┘
 ```
