@@ -39,9 +39,10 @@ make run
 ```
 
 In another terminal, apply your model manifest:
+
 `kubectl apply -f mistral-7b.yaml`
 
-# 4. Monitor the Lifecycle Status
+## 4. Monitor the Lifecycle Status
 
 `kubectl get vllmmodel mistral-7b-prod -o yaml`
 
@@ -69,11 +70,14 @@ vllm-operator/
 The operator utilizes standard Kubebuilder macros to auto-generate RBAC configurations and manifests. Every time you update the Go API specifications, remember to run:
 Bash
 
+The operator utilizes standard Kubebuilder macros to auto-generate RBAC configurations and manifests. Every time you update the Go API specifications, remember to run:
+
+```bash
 # Regenerate deepcopy and manifests
-`make manifests`
+make manifests
 
 # Run unit/integration tests
-`make test`
+make test
 
 # License
 
