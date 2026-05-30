@@ -29,18 +29,19 @@ spec:
 ### Clone the repository
 ```shell
 git clone [https://github.com/PhenixForge/vllm-operator.git](https://github.com/PhenixForge/vllm-operator.git)
-cd vllm-operator```
+cd vllm-operator
 
 # Install the Custom Resource Definitions (CRDs) onto the cluster
-`make install`
+make install
 
 # Run the controller locally against your cluster context
-`make run`
+make run```
 
 In another terminal, apply your model manifest:
-```Bash
+`
 kubectl apply -f mistral-7b.yaml
-```
+`
+
 # 4. Monitor the Lifecycle Status
 
 `kubectl get vllmmodel mistral-7b-prod -o yaml`
