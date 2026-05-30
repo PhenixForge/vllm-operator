@@ -4,11 +4,9 @@ Kubernetes Operator in Go for production vLLM deployment. Automates storage prov
 # Quick Start
 ## 1. Prerequisites
 
-    Kubernetes cluster (v1.26+) or a local Kind / Minikube setup.
-
-    Go v1.22+ installed (for local development).
-
-    kubectl configured to your cluster.
+- Kubernetes cluster (v1.26+) or a local Kind / Minikube setup.
+- Go v1.22+ installed (for local development).
+- kubectl configured to your cluster.
 
 ## 2. Define your Custom Resource (CR)
 
@@ -27,10 +25,8 @@ spec:
 ```
 
 ## 3. Deploy the Operator
-Bash
-(...)
 
-# Clone the repository
+### Clone the repository
 ```shell
 git clone [https://github.com/PhenixForge/vllm-operator.git](https://github.com/PhenixForge/vllm-operator.git)
 cd vllm-operator```
@@ -45,7 +41,7 @@ In another terminal, apply your model manifest:
 ```Bash
 kubectl apply -f mistral-7b.yaml
 ```
-4. Monitor the Lifecycle Status
+# 4. Monitor the Lifecycle Status
 
 `kubectl get vllmmodel mistral-7b-prod -o yaml`
 
