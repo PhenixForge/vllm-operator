@@ -1,7 +1,7 @@
 # vLLM-Operator
 Kubernetes Operator in Go for production vLLM deployment. Automates storage provisioning and model weight pre-downloading via ephemeral Jobs to eliminate HPA cold-start bottlenecks.
 
-Quick Start
+# Quick Start
 1. Prerequisites
 
     Kubernetes cluster (v1.26+) or a local Kind / Minikube setup.
@@ -13,7 +13,7 @@ Quick Start
 2. Define your Custom Resource (CR)
 
 Create a file named mistral-7b.yaml to declare your high-performance serving infrastructure:
-YAML
+```YAML
 
 apiVersion: infra.jpetron.io/v1alpha1
 kind: VLLMModel
@@ -24,6 +24,7 @@ spec:
   replicas: 2
   storageSize: "30Gi"
   storageClass: "local-path" # Perfect for local testing on Kind
+```
 
 3. Deploy the Operator
 Bash
@@ -40,14 +41,11 @@ cd vllm-operator```
 `make run`
 
 In another terminal, apply your model manifest:
-Bash
-
+```Bash
 kubectl apply -f mistral-7b.yaml
-
+```
 4. Monitor the Lifecycle Status
-Bash
-
-kubectl get vllmmodel mistral-7b-prod -o yaml
+`kubectl get vllmmodel mistral-7b-prod -o yaml`
 
 The custom status field will transition naturally through the infrastructure phases: Provisioning ──► Downloading ──► Ready.
 
