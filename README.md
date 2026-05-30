@@ -42,6 +42,13 @@ In another terminal, apply your model manifest:
 
 `kubectl apply -f mistral-7b.yaml`
 
+### 4. Verify that it works
+Check the Pods and PVCs:
+```bash
+kubectl get pods -l app=vllm-model
+kubectl get pvc -l app=vllm-model
+```
+
 ## 4. Monitor the Lifecycle Status
 
 `kubectl get vllmmodel mistral-7b-prod -o yaml`
