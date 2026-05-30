@@ -40,7 +40,9 @@ make run
 
 In another terminal, apply your model manifest:
 
-`kubectl apply -f mistral-7b.yaml`
+```shell
+kubectl apply -f mistral-7b.yaml
+```
 
 ### 4. Verify that it works
 Check the Pods and PVCs:
