@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Go Version](https://img.shields.io/badge/Go-v1.22%2B-00ADD8?logo=go)](https://golang.org/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.26%2B-326CE5?logo=kubernetes)](https://kubernetes.io/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Julien-blue?logo=linkedin)](https://www.linkedin.com/in/julien-phenixforge/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Julien-blue?logo=linkedin)](https://www.linkedin.com/in/julien-p-68834731/?locale=fr)
 
 `vllm-operator` is a Kubernetes operator designed to automate the lifecycle, storage provisioning, and deployment scaling of Large Language Models (LLMs) served via vLLM.
 
