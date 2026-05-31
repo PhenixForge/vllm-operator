@@ -1,8 +1,16 @@
 # vLLM-Operator
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.26%2B-326CE5?logo=kubernetes)](https://kubernetes.io/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Go Version](https://img.shields.io/badge/Go-v1.22%2B-00ADD8?logo=go)](https://golang.org/)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.26%2B-326CE5?logo=kubernetes)](https://kubernetes.io/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Julien-blue?logo=linkedin)](https://www.linkedin.com/in/julien-p-68834731/?locale=fr)
+[![GitHub Stars](https://img.shields.io/github/stars/PhenixForge/vllm-operator?style=social)](https://github.com/PhenixForge/vllm-operator/stargazers)
+[![CI](https://github.com/PhenixForge/vllm-operator/actions/workflows/test.yml/badge.svg)](https://github.com/PhenixForge/vllm-operator/actions)
+
+# vLLM Operator
+## Automate LLMs deployments.
+
+| [vLLM](https://github.com/vllm-project/vllm) | [Kubernetes](https://github.com/kubernetes/kubernetes) | Go
+
 
 `vllm-operator` is a Kubernetes operator designed to automate the lifecycle, storage provisioning, and deployment scaling of Large Language Models (LLMs) served via vLLM.
 
