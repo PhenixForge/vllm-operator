@@ -4,7 +4,7 @@
 [![Go Version](https://img.shields.io/badge/Go-v1.22%2B-00ADD8?logo=go)](https://golang.org/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Julien-blue?logo=linkedin)](https://www.linkedin.com/in/julien-p-68834731/?locale=fr)
 [![GitHub Stars](https://img.shields.io/github/stars/PhenixForge/vllm-operator?style=social)](https://github.com/PhenixForge/vllm-operator/stargazers)
-[![CI](https://github.com/PhenixForge/vllm-operator/actions/workflows/test.yml/badge.svg)](https://github.com/PhenixForge/vllm-operator/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/PhenixForge/vllm-operator/test.yml?branch=main)](https://github.com/PhenixForge/vllm-operator/actions)
 
 # vLLM Operator
 ## Automate LLMs deployments.
