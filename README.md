@@ -5,8 +5,6 @@
 [![GitHub Stars](https://img.shields.io/github/stars/PhenixForge/vllm-operator?style=social)](https://github.com/PhenixForge/vllm-operator/stargazers)
 [![CI](https://img.shields.io/github/actions/workflow/status/PhenixForge/vllm-operator/test.yml?branch=main)](https://github.com/PhenixForge/vllm-operator/actions)
 
----
-
 # vLLM Operator
 ## Automate LLMs deployments.
 
