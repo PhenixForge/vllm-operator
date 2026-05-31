@@ -1,0 +1,11 @@
+resources:
+- bases/infra.phenixforge.io_vllmmodel.yaml
+
+namespace: default
+
+commonLabels:
+  app.kubernetes.io/name: vllm-operator
+  app.kubernetes.io/managed-by: kustomize
+
+commonAnnotations:
+  app.kubernetes.io/description: "vLLM-Operator CRD"

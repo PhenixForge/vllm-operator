@@ -1,0 +1,12 @@
+resources:
+- role.yaml
+- role_binding.yaml
+
+namespace: default
+
+commonLabels:
+  app.kubernetes.io/name: vllm-operator
+  app.kubernetes.io/managed-by: kustomize
+
+commonAnnotations:
+  app.kubernetes.io/description: "vLLM-Operator RBAC"
