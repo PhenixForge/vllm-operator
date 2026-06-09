@@ -198,6 +198,9 @@ make manifests
 make test
 ```
 
+> [!WARNING]  
+> This project is currently a **Work in Progress (Alpha)**. The core reconciliation logic is being ported to a clean Kubebuilder scaffold.
+
 Expected output:
 ```text
 go test ./... -coverprofile cover.out
